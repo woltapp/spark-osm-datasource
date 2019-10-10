@@ -1,6 +1,8 @@
 package akashihi.osm.spark.OsmSource
 
-import org.apache.spark.sql.types.{ArrayType, BooleanType, ByteType, DoubleType, IntegerType, LongType, MapType, StringType, StructField, StructType}
+import org.apache.spark.sql.sources.v2.reader.DataSourceReader
+import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSupport}
+import org.apache.spark.sql.types.{ArrayType, BooleanType, ByteType, DoubleType, IntegerType, LongType, MapType, ShortType, StringType, StructField, StructType}
 
 object OsmSource {
   private val info = Seq(
@@ -15,7 +17,7 @@ object OsmSource {
   private val member = Seq(
     StructField("ID", LongType, nullable = false),
     StructField("ROLE", StringType, nullable = true),
-    StructField("TYPE", ByteType, nullable = false)
+    StructField("TYPE", IntegerType, nullable = false)
   )
 
   private val fields = Seq(
@@ -28,5 +30,9 @@ object OsmSource {
     StructField("RELATION", ArrayType(StructType(member), containsNull = false), nullable = true)
   )
 
-  private val schema = StructType(fields)
+  val schema = StructType(fields)
+}
+
+class DefaultSource extends DataSourceV2 with ReadSupport {
+  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("input").get, options.get("partitions").get)
 }
