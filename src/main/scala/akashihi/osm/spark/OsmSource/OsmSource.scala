@@ -34,5 +34,5 @@ object OsmSource {
 }
 
 class DefaultSource extends DataSourceV2 with ReadSupport {
-  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("input").get, options.get("partitions").get)
+  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("path").get, options.get("partitions").get)
 }

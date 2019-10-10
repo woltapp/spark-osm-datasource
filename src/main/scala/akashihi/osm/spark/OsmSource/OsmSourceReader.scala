@@ -20,7 +20,7 @@ class OsmSourceReader(input: String, partitions: String) extends DataSourceReade
 
   override def planInputPartitions(): util.List[InputPartition[InternalRow]] = {
     val partitionsNo = Try(partitions.toInt).getOrElse(1)
-    (1 to partitionsNo).map(p => new OsmPartition(input, p)).toList
+    (0 to partitionsNo).map(p => new OsmPartition(input, partitionsNo,  p)).toList
   }
 
   override def pruneColumns(requiredSchema: StructType): Unit = {
