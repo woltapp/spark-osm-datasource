@@ -63,7 +63,7 @@ class OsmPartitionReader(input: String, schema: StructType, partitionsNo: Int, p
   }
 
   def makeTags(tags: java.util.Map[String, String]): MapData = {
-    val stringifiedTags = tags.toMap.flatMap(kv => Map(UTF8String.fromString(kv._1) -> UTF8String.fromString(kv._2)))
+    val stringifiedTags = tags.toMap.flatMap(kv => Map(UTF8String.fromString(kv._1.toLowerCase) -> UTF8String.fromString(kv._2)))
     ArrayBasedMapData(stringifiedTags)
   }
 
