@@ -5,7 +5,7 @@ import java.util.concurrent.{Callable, FutureTask, LinkedBlockingQueue, TimeUnit
 import java.util.function.Consumer
 
 import akashihi.osm.parallelpbf.ParallelBinaryParser
-import akashihi.osm.parallelpbf.entity.{Info, Node}
+import akashihi.osm.parallelpbf.entity.{Info, Node, Way}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.sources.v2.reader.InputPartitionReader
@@ -17,7 +17,9 @@ class OsmPartitionReader(input: String, partitionsNo: Int, partition: Int) exten
   private var parserTask = new FutureTask[Unit](new Callable[Unit]() {
     override def call: Unit = {
       val inputStream = new FileInputStream(input)
-      val parser = new ParallelBinaryParser(inputStream, 1, partitionsNo, partition).onNode(onNode)
+      val parser = new ParallelBinaryParser(inputStream, 1, partitionsNo, partition)
+        .onNode(onNode)
+          .onWay(onWay)
       parser.parse()
     }
   })
@@ -30,7 +32,7 @@ class OsmPartitionReader(input: String, partitionsNo: Int, partition: Int) exten
       parseThread = new Thread(parserTask)
       parseThread.start()
     }
-    if (!parserTask.isDone || !queue.isEmpty) {
+    while (!parserTask.isDone || !queue.isEmpty) {
       currentRow = queue.poll(1, TimeUnit.SECONDS)
       if (currentRow != null) {
         return true
@@ -77,7 +79,19 @@ class OsmPartitionReader(input: String, partitionsNo: Int, partition: Int) exten
         null
       }
       val row = InternalRow(t.getId, makeTags(t.getTags), info, t.getLat, t.getLon, null, null)
-      queue.put(row)
+      queue.offer(row, 1, TimeUnit.SECONDS)
+    }
+  }
+
+  private val onWay = new Consumer[Way] {
+    override def accept(t: Way): Unit = {
+      val info = if (t.getInfo != null) {
+        makeInfo(t.getInfo)
+      } else {
+        null
+      }
+      val row = InternalRow(t.getId, makeTags(t.getTags), info, null, null, ArrayData.toArrayData(t.getNodes.toArray), null)
+      queue.offer(row, 1, TimeUnit.SECONDS)
     }
   }
 }

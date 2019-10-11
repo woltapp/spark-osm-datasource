@@ -1,4 +1,5 @@
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 
 object OsmReaderExample {
   def main(args: Array[String]): Unit = {
@@ -10,6 +11,6 @@ object OsmReaderExample {
       .getOrCreate()
 
     val osm = spark.read.option("partitions", 10).format("akashihi.osm.spark.OsmSource").load("/home/chollya/Dropbox/Work/parallelpbf/src/test/resources/sample.pbf")
-    osm.show(truncate = false)
+    osm.filter(isnull(col("LAT"))).show(false)
   }
 }
