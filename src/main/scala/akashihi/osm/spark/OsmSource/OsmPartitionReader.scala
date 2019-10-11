@@ -6,6 +6,7 @@ import java.util.function.Consumer
 
 import akashihi.osm.parallelpbf.ParallelBinaryParser
 import akashihi.osm.parallelpbf.entity.{Node, OsmEntity, Relation, Way}
+import org.apache.spark.SparkFiles
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.sources.v2.reader.InputPartitionReader
@@ -20,7 +21,8 @@ class OsmPartitionReader(input: String, schema: StructType, partitionsNo: Int, p
 
   private val parserTask = new FutureTask[Unit](new Callable[Unit]() {
     override def call: Unit = {
-      val inputStream = new FileInputStream(input)
+      val fname = SparkFiles.get(input)
+      val inputStream = new FileInputStream(fname)
       val parser = new ParallelBinaryParser(inputStream, 1, partitionsNo, partition)
 
       if (schemaColumnNames.exists(field => field.equalsIgnoreCase("LAT") || field.equals("LON"))) {

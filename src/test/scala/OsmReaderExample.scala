@@ -10,7 +10,8 @@ object OsmReaderExample {
       .config("spark.testing.memory", "17179869184")
       .getOrCreate()
 
-    val osm = spark.read.option("partitions", 10).format("akashihi.osm.spark.OsmSource").load("/home/chollya/Dropbox/Work/parallelpbf/src/test/resources/sample.pbf")
+    spark.sparkContext.addFile("/home/chollya/Dropbox/Work/parallelpbf/src/test/resources/sample.pbf")
+    val osm = spark.read.option("partitions", 10).format("akashihi.osm.spark.OsmSource").load("sample.pbf")
     osm.drop("RELATION", "INFO", "LAT", "LON").show(false)
   }
 }
