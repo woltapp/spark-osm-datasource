@@ -11,6 +11,6 @@ object OsmReaderExample {
       .getOrCreate()
 
     val osm = spark.read.option("partitions", 10).format("akashihi.osm.spark.OsmSource").load("/home/chollya/Dropbox/Work/parallelpbf/src/test/resources/sample.pbf")
-    osm.filter(isnull(col("LAT"))).show(false)
+    osm.filter(isnull(col("LAT"))).filter(isnull(col("WAY"))).show(false)
   }
 }
