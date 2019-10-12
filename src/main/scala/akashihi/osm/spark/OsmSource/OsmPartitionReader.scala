@@ -16,14 +16,14 @@ import org.apache.spark.unsafe.types.UTF8String
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
-class OsmPartitionReader(input: String, schema: StructType, partitionsNo: Int, partition: Int) extends InputPartitionReader[InternalRow] {
+class OsmPartitionReader(input: String, schema: StructType, threads: Int, partitionsNo: Int, partition: Int) extends InputPartitionReader[InternalRow] {
   private val schemaColumnNames = schema.fields.map(_.name)
 
   private val parserTask = new FutureTask[Unit](new Callable[Unit]() {
     override def call: Unit = {
       val fname = SparkFiles.get(input)
       val inputStream = new FileInputStream(fname)
-      val parser = new ParallelBinaryParser(inputStream, 1, partitionsNo, partition)
+      val parser = new ParallelBinaryParser(inputStream, threads, partitionsNo, partition)
 
       if (schemaColumnNames.exists(field => field.equalsIgnoreCase("LAT") || field.equals("LON"))) {
         parser.onNode(onNode)

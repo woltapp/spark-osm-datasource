@@ -2,7 +2,7 @@ package akashihi.osm.spark.OsmSource
 
 import org.apache.spark.sql.sources.v2.reader.DataSourceReader
 import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSupport}
-import org.apache.spark.sql.types.{ArrayType, BooleanType, ByteType, DoubleType, IntegerType, LongType, MapType, ShortType, StringType, StructField, StructType}
+import org.apache.spark.sql.types._
 
 object OsmSource {
   private val info = Seq(
@@ -34,5 +34,5 @@ object OsmSource {
 }
 
 class DefaultSource extends DataSourceV2 with ReadSupport {
-  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("path").get, options.get("partitions").get)
+  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("path").get, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
 }
