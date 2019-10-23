@@ -1,4 +1,4 @@
-organization := "akashihi.osm"
+organization := "org.akashihi.osm"
 homepage := Some(url("https://github.com/akashihi/spark-osm-reader"))
 scmInfo := Some(ScmInfo(url("https://github.com/akashihi/spark-osm-reader"), "git@github.com:akashihi/spark-osm-reader.git"))
 developers := List(Developer("akashihi",
@@ -16,11 +16,11 @@ publishTo := Some(
     Opts.resolver.sonatypeStaging
 )
 
-name := "spark-osm-reader"
+name := "spark-osm-datasource"
 version := "0.1.0"
 
 scalaVersion := "2.11.12"
-crossScalaVersions := Seq("2.12.10", "2.13.1")
+crossScalaVersions := Seq("2.12.10")
 
 val mavenLocal = "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + ".m2/repository"
 resolvers += mavenLocal
