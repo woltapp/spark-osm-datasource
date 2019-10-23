@@ -4,8 +4,8 @@ import java.io.FileInputStream
 import java.util.concurrent._
 import java.util.function.Consumer
 
-import akashihi.osm.parallelpbf.ParallelBinaryParser
-import akashihi.osm.parallelpbf.entity.{Node, OsmEntity, Relation, Way}
+import org.akashihi.osm.parallelpbf.ParallelBinaryParser
+import org.akashihi.osm.parallelpbf.entity._
 import org.apache.spark.SparkFiles
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util._
