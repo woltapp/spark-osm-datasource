@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
 
 object OsmReaderExample {
-  private def getQty(df: DataFrame)(osmType: String): Long = df.filter(col("TYPE") === osmType).select("count").collect().head.getAs[Long](0)
+  private def getQty(df: DataFrame)(osmType: Int): Long = df.filter(col("TYPE") === osmType).select("count").collect().head.getAs[Long](0)
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
@@ -24,15 +24,13 @@ object OsmReaderExample {
       .load(sourceFile.getName).drop("INFO")
       .persist(StorageLevel.MEMORY_AND_DISK)
 
-    val combined = osm.withColumn("TYPE", when(col("LAT").isNotNull, lit("NODE")).when(col("WAY").isNotNull, lit("WAY")).when(col("RELATION").isNotNull, lit("RELATION")))
-
-    val counted = combined.groupBy("TYPE").count()
+    val counted = osm.groupBy("TYPE").count()
 
     val objectCountGet = getQty(counted)(_)
-    val nodes = objectCountGet("NODE")
-    val ways = objectCountGet("WAY")
-    val relations = objectCountGet("RELATION")
-    
+    val nodes = objectCountGet(0)
+    val ways = objectCountGet(1)
+    val relations = objectCountGet(2)
+
     println(s"Nodes: $nodes, Ways: $ways, Relations: $relations, partitions: ${osm.rdd.partitions.length}")
   }
 }

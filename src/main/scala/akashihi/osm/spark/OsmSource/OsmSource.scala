@@ -24,6 +24,7 @@ object OsmSource {
     StructField("ID", LongType, nullable = false),
     StructField("TAG", MapType(StringType, StringType, valueContainsNull = false), nullable = false),
     StructField("INFO", StructType(info), nullable = true),
+    StructField("TYPE", IntegerType, nullable = false),
     StructField("LAT", DoubleType, nullable = true),
     StructField("LON", DoubleType, nullable = true),
     StructField("WAY", ArrayType(LongType, containsNull = false), nullable = true),

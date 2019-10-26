@@ -39,7 +39,7 @@ class OsmPartitionReader(input: String, schema: StructType, threads: Int, partit
     }
   })
   private var parseThread: Thread = _
-  private val queue = new SynchronousQueue[InternalRow] //Nine is picked absolutely randomly
+  private val queue = new SynchronousQueue[InternalRow]
   private var currentRow: InternalRow = _
 
   override def next(): Boolean = {
@@ -107,6 +107,9 @@ class OsmPartitionReader(input: String, schema: StructType, threads: Int, partit
 
   private val onNode = callback[Node](t => {
     val content = mutable.MutableList[Any]()
+    if (schemaColumnNames.exists(_.equalsIgnoreCase("TYPE"))) {
+      content += RelationMember.Type.NODE.ordinal()
+    }
     if (schemaColumnNames.exists(_.equalsIgnoreCase("LAT"))) {
       content += t.getLat
     }
@@ -124,6 +127,9 @@ class OsmPartitionReader(input: String, schema: StructType, threads: Int, partit
 
   private val onWay = callback[Way](t => {
     val content = mutable.MutableList[Any]()
+    if (schemaColumnNames.exists(_.equalsIgnoreCase("TYPE"))) {
+      content += RelationMember.Type.WAY.ordinal()
+    }
     if (schemaColumnNames.exists(_.equalsIgnoreCase("LAT"))) {
       content += null
     }
@@ -150,6 +156,9 @@ class OsmPartitionReader(input: String, schema: StructType, threads: Int, partit
       InternalRow(member.getId, role, member.getType.ordinal())
     })
 
+    if (schemaColumnNames.exists(_.equalsIgnoreCase("TYPE"))) {
+      content += RelationMember.Type.RELATION.ordinal()
+    }
     if (schemaColumnNames.exists(_.equalsIgnoreCase("LAT"))) {
       content += null
     }

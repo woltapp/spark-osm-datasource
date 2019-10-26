@@ -65,6 +65,7 @@ Due to Spark processing paradigm, all types of the OSM entities are mapped to th
                                        StructField("CHANGESET", LongType, nullable = true),
                                        StructField("VISIBLE", BooleanType, nullable = false)
                                         ), nullable = true),
+    StructField("TYPE", IntegerType, nullable = false),
     StructField("LAT", DoubleType, nullable = true),
     StructField("LON", DoubleType, nullable = true),
     StructField("WAY", ArrayType(LongType, containsNull = false), nullable = true),
@@ -77,8 +78,15 @@ OSM nodes will have `LAT` and `LON` fields set and `WAY` and `RELATION` fields w
 OSM nodes will have `WAY` fields set and `LAT`/`LON` and `RELATION` fields will be null.
 OSM relations will have `RELATION` fields set and `LAT`/`LON` and `WAYS` fields will be null.
 
+`TYPE` field in both `RELATION` structure and in dataframe structure indicates type of the OSM entity. It is an
+integer field with following values:
+
+* 0 - Item is a OSM Node entity
+* 1 - Item is a OSM Way entity
+* 2 - Item is a OSM Relation entity
+
 Reader supports column pruning during read, so dropped columnts will not be loaded from the OSM PBF file. Even more,
-if both `LAT` and `LON` colmns will be dropped, no node processing will be started at all. Same applies for
+if both `LAT` and `LON` columns will be dropped, no node processing will be started at all. Same applies for
 `WAY` and `RELATION` columnn.
 
 ### Warning on order instability
