@@ -10,21 +10,34 @@ processing. With Spark abilities to automatically distribute huge dataset over h
 single node could fit, it sounds pretty logical to implement native Spark OSM PBF data source  
 ## Download
 
+Supported scala versions are 2.11 and 2.12
+
 ### Maven 
         
-        incomplete
+         <dependency>
+                <groupId>org.akashihi.osm</groupId>
+                <artifactId>spark-osm-datasource_2.11</artifactId>
+                <version>0.1.0</version>
+         </dependency>
+
+         <dependency>
+                <groupId>org.akashihi.osm</groupId>
+                <artifactId>spark-osm-datasource_2.12</artifactId>
+                <version>0.1.0</version>
+         </dependency>
         
 ### Gradle
 
-        incomplete
+         compile group: 'org.akashihi.osm', name: 'spark-osm-datasource_2.11', version: '0.1.0'
+         compile group: 'org.akashihi.osm', name: 'spark-osm-datasource_2.12', version: '0.1.0'
         
 ### SBT 
                         
-        incomplete
+        libraryDependencies += "org.akashihi.osm" % "spark-osm-datasource" % "0.1.0"
         
 ### Github release
 
-        incomplete
+        https://github.com/akashihi/spark-osm-datasource/releases/tag/v0.1.0
         
 ## Usage                
         
@@ -36,10 +49,10 @@ partitions are requested:
     val spark = SparkSession
       .builder()
       .appName("OsmReader")
-      .config("spark.master", "local[24]")
+      .config("spark.master", "local[4]")
       .getOrCreate()
 
-    val osm = spark.read.option("partitions", 256).format("akashihi.osm.spark.OsmSource").load("s3://maps/extract-cesko-brno.osm.pbf").drop("INFO").persist(StorageLevel.MEMORY_AND_DISK)
+    val osm = spark.read.option("partitions", 256).format(OsmSource.OSM_SOURCE_NAME).load("s3://maps/extract-cesko-brno.osm.pbf").drop("INFO").persist(StorageLevel.MEMORY_AND_DISK)
     
 There are two options for the reader:
 
