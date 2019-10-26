@@ -1,6 +1,6 @@
 organization := "org.akashihi.osm"
-homepage := Some(url("https://github.com/akashihi/spark-osm-reader"))
-scmInfo := Some(ScmInfo(url("https://github.com/akashihi/spark-osm-reader"), "git@github.com:akashihi/spark-osm-reader.git"))
+homepage := Some(url("https://github.com/akashihi/spark-osm-datasource"))
+scmInfo := Some(ScmInfo(url("https://github.com/akashihi/spark-osm-datasource"), "git@github.com:akashihi/spark-osm-datasource.git"))
 developers := List(Developer("akashihi",
   "Denis Chaplygin",
   "akashihi@gmail.com",
