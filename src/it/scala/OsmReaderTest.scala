@@ -1,3 +1,4 @@
+import akashihi.osm.spark.OsmSource.OsmSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
@@ -19,7 +20,7 @@ class OsmReaderTest extends FunSuite with BeforeAndAfter {
     spark.read
       .option("threads", 6)
       .option("partitions", 8)
-      .format("akashihi.osm.spark.OsmSource")
+      .format(OsmSource.OSM_SOURCE_NAME)
       .load(path).persist(StorageLevel.MEMORY_AND_DISK)
   }
 

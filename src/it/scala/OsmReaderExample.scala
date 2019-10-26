@@ -1,3 +1,4 @@
+import akashihi.osm.spark.OsmSource.OsmSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
@@ -16,7 +17,7 @@ object OsmReaderExample {
     val osm = spark.read
       .option("threads", 6)
       .option("partitions", 8)
-      .format("akashihi.osm.spark.OsmSource")
+      .format(OsmSource.OSM_SOURCE_NAME)
       .load(args(0)).drop("INFO")
       .persist(StorageLevel.MEMORY_AND_DISK)
 
