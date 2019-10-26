@@ -1,5 +1,3 @@
-import java.io.File
-
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
@@ -15,13 +13,11 @@ object OsmReaderExample {
       .config("spark.executor.memory", "4gb")
       .getOrCreate()
 
-    val sourceFile = new File(args(0))
-    spark.sparkContext.addFile(sourceFile.getAbsolutePath)
     val osm = spark.read
       .option("threads", 6)
       .option("partitions", 8)
       .format("akashihi.osm.spark.OsmSource")
-      .load(sourceFile.getName).drop("INFO")
+      .load(args(0)).drop("INFO")
       .persist(StorageLevel.MEMORY_AND_DISK)
 
     val counted = osm.groupBy("TYPE").count()

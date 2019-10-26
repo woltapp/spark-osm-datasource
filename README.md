@@ -29,8 +29,9 @@ single node could fit, it sounds pretty logical to implement native Spark OSM PB
 ## Usage                
         
 OSM PBF data source uses [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf) internally, therefore it needs to provide
-it with a input stream. The simplest way to do that while keeping it compatible with most of file sources is to add file
-to a spark context first:
+it with a input stream. OSM DataSource internally uses HDFS driver, so it will accept any HDFS compatible path, like local
+file, http link, s3 link etc and convert it to the inputstream. The stream will be opened and read as many times, as many
+partitions are requested:
 
     val spark = SparkSession
       .builder()
@@ -38,18 +39,13 @@ to a spark context first:
       .config("spark.master", "local[24]")
       .getOrCreate()
 
-    spark.sparkContext.addFile("/osm/data/extract-cesko-brno.osm.pbf")
-
-The next thing do to is actually load the file. Please keep in mind, that you should specify just a file name as 
-the `load` parameter, not a full path.     
-    
-    val osm = spark.read.option("partitions", 256).format("akashihi.osm.spark.OsmSource").load("extract-cesko-brno.osm.pbf").drop("INFO").persist(StorageLevel.MEMORY_AND_DISK)
+    val osm = spark.read.option("partitions", 256).format("akashihi.osm.spark.OsmSource").load("s3://maps/extract-cesko-brno.osm.pbf").drop("INFO").persist(StorageLevel.MEMORY_AND_DISK)
     
 There are two options for the reader:
 
 * `partitions` - Number of partitions to split OSM PBF file. Pay attentions, that full planet file is about 1.2TB of uncompressed data, so plan
 your partitioning accordingly.
-* `thread` - Number of threads to use by [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf). Keep it
+* `threads` - Number of threads to use by [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf). Keep it
 `1` for a local deployments or set to number of cores per worker node.
 
 ## Schema
@@ -93,7 +89,7 @@ if both `LAT` and `LON` columns will be dropped, no node processing will be star
 
 OSM PBF file can be sorted and stored in a ordered way. Unfortunately, due to parallel nature of the Spark, that 
 ordering will be broken during parsing and several consequent dataframe loads may return data in a different order for 
-each run. In case order is important for you, you can dataframe sort after loading. 
+each run. In case order is important for you, you can sort the dataframe after loading. 
                           |
 
 ## Versioning

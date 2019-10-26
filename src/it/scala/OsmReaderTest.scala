@@ -1,11 +1,8 @@
-import java.io.File
-
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
-import org.scalatest._
 import org.scalactic.Tolerance._
-import org.scalactic.StringNormalizations._
+import org.scalatest._
 
 import scala.collection.mutable
 
@@ -19,13 +16,11 @@ class OsmReaderTest extends FunSuite with BeforeAndAfter {
       .getOrCreate()
 
     val path = getClass.getResource("sample.pbf").getPath
-    val sourceFile = new File(path)
-    spark.sparkContext.addFile(sourceFile.getAbsolutePath)
     spark.read
       .option("threads", 6)
       .option("partitions", 8)
       .format("akashihi.osm.spark.OsmSource")
-      .load(sourceFile.getName).persist(StorageLevel.MEMORY_AND_DISK)
+      .load(path).persist(StorageLevel.MEMORY_AND_DISK)
   }
 
   test("Simple node should be read with correct coordinates") {
