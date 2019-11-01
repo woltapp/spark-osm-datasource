@@ -1,4 +1,4 @@
-package akashihi.osm.spark.OsmSource
+package org.akashihi.osm.spark.OsmSource
 
 import java.util
 

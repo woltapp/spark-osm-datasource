@@ -1,11 +1,11 @@
-package akashihi.osm.spark.OsmSource
+package org.akashihi.osm.spark.OsmSource
 
 import org.apache.spark.sql.sources.v2.reader.DataSourceReader
 import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSupport}
 import org.apache.spark.sql.types._
 
 object OsmSource {
-  val OSM_SOURCE_NAME = "akashihi.osm.spark.OsmSource"
+  val OSM_SOURCE_NAME = "org.akashihi.osm.spark.OsmSource"
 
   private val info = Seq(
     StructField("UID", IntegerType, nullable = true),

@@ -1,4 +1,4 @@
-import akashihi.osm.spark.OsmSource.OsmSource
+import org.akashihi.osm.spark.OsmSource.OsmSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel

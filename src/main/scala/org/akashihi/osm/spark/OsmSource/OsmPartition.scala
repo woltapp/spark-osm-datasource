@@ -1,4 +1,4 @@
-package akashihi.osm.spark.OsmSource
+package org.akashihi.osm.spark.OsmSource
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.sources.v2.reader.{InputPartition, InputPartitionReader}
