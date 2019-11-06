@@ -1,5 +1,7 @@
 package org.akashihi.osm.spark.OsmSource
 
+import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.sources.v2.reader.DataSourceReader
 import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSupport}
 import org.apache.spark.sql.types._
@@ -37,5 +39,14 @@ object OsmSource {
 }
 
 class DefaultSource extends DataSourceV2 with ReadSupport {
-  override def createReader(options: DataSourceOptions): DataSourceReader = new OsmSourceReader(options.get("path").get, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
+  override def createReader(options: DataSourceOptions): DataSourceReader = {
+    val path = options.get("path").get
+    val spark = SparkSession.getActiveSession.get
+    val source = new Path(path)
+    val fs = source.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    if (!fs.exists(source)) {
+      throw new RuntimeException(s"Input unavailable: $path")
+    }
+    new OsmSourceReader(path, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
+  }
 }
