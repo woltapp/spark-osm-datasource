@@ -9,7 +9,7 @@ import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConversions._
 import scala.util.Try
 
-class OsmSourceReader(input: String, hadoop: SerializableHadoopConfigration, partitions: String, threads: String) extends DataSourceReader with SupportsPushDownRequiredColumns {
+class OsmSourceReader(input: String, hadoop: SerializableHadoopConfigration, partitions: String, threads: String, useLocal: Boolean) extends DataSourceReader with SupportsPushDownRequiredColumns {
   private var requiredSchema = OsmSource.schema
 
   override def readSchema(): StructType = requiredSchema
@@ -17,8 +17,8 @@ class OsmSourceReader(input: String, hadoop: SerializableHadoopConfigration, par
   override def planInputPartitions(): util.List[InputPartition[InternalRow]] = {
     val partitionsNo = Try(partitions.toInt).getOrElse(1)
     val threadsNo = Try(threads.toInt).getOrElse(1)
-    val shiftedPartitions = partitionsNo -1
-    (0 to shiftedPartitions).map(p => new OsmPartition(input, hadoop, this.requiredSchema, threadsNo, partitionsNo,  p)).toList
+    val shiftedPartitions = partitionsNo - 1
+    (0 to shiftedPartitions).map(p => new OsmPartition(input, hadoop, this.requiredSchema, threadsNo, partitionsNo, p, useLocal)).toList
   }
 
   override def pruneColumns(requiredSchema: StructType): Unit = {

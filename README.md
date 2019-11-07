@@ -60,7 +60,18 @@ There are two options for the reader:
 your partitioning accordingly.
 * `threads` - Number of threads to use by [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf). Keep it
 `1` for a local deployments or set to number of cores per worker node.
+* `useLocalFile` - Enables Spark file distribution mechanics, see below.
 
+### Using with Spark file distirbution 
+
+Another one option is to use Sparks ability to cache file on the nodes and read it locally. With that approach under some circumstances (repeated re-reading
+of same set of big files in different steps) a better performance can be achieved.
+
+        spark.sparkContext.addFile("s3://maps/extract-cesko-brno.osm.pbf")
+        val osm = spark.read.option("partitions", 256).option("useLocalFile", "true").format(OsmSource.OSM_SOURCE_NAME).load("extract-cesko-brno.osm.pbf")
+        
+Please keep in mind, that you should specify just a file name as the `load` parameter, not a full path.
+        
 ## Schema
 
 Due to Spark processing paradigm, all types of the OSM entities are mapped to the same dataframe of the following structure:

@@ -1,6 +1,9 @@
 package org.akashihi.osm.spark.OsmSource
 
+import java.io.File
+
 import org.apache.hadoop.fs.Path
+import org.apache.spark.SparkFiles
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.sources.v2.reader.DataSourceReader
 import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSupport}
@@ -41,14 +44,23 @@ object OsmSource {
 class DefaultSource extends DataSourceV2 with ReadSupport {
   override def createReader(options: DataSourceOptions): DataSourceReader = {
     val path = options.get("path").get
+    val useLocal = options.get("useLocalFile").orElse("").equalsIgnoreCase("true")
+
     val spark = SparkSession.active
     val hadoop = spark.sessionState.newHadoopConf()
-    val source = new Path(path)
-    val fs = source.getFileSystem(hadoop)
-    if (!fs.exists(source)) {
-      throw new RuntimeException(s"Input unavailable: $path")
-    }
     val hadoopConfiguration = new SerializableHadoopConfigration(hadoop)
-    new OsmSourceReader(path, hadoopConfiguration, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
+
+    if (useLocal) {
+      if (!new File(SparkFiles.get(path)).canRead) {
+        throw new RuntimeException(s"Input unavailable: $path")
+      }
+    } else {
+      val source = new Path(path)
+      val fs = source.getFileSystem(hadoop)
+      if (!fs.exists(source)) {
+        throw new RuntimeException(s"Input unavailable: $path")
+      }
+    }
+    new OsmSourceReader(path, hadoopConfiguration, options.get("partitions").orElse("1"), options.get("threads").orElse("1"), useLocal)
   }
 }

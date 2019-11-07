@@ -1,11 +1,13 @@
 package org.akashihi.osm.spark.OsmSource
 
+import java.io.{FileInputStream, InputStream}
 import java.util.concurrent._
 import java.util.function.Consumer
 
 import org.akashihi.osm.parallelpbf.ParallelBinaryParser
 import org.akashihi.osm.parallelpbf.entity._
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
+import org.apache.spark.SparkFiles
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.sources.v2.reader.InputPartitionReader
@@ -15,7 +17,7 @@ import org.apache.spark.unsafe.types.UTF8String
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
-class OsmPartitionReader(input: String, hadoop:SerializableHadoopConfigration, schema: StructType, threads: Int, partitionsNo: Int, partition: Int) extends InputPartitionReader[InternalRow] {
+class OsmPartitionReader(input: String, hadoop:SerializableHadoopConfigration, schema: StructType, threads: Int, partitionsNo: Int, partition: Int, useLocal: Boolean) extends InputPartitionReader[InternalRow] {
   private val schemaColumnNames = schema.fields.map(_.name)
 
   private val parserTask = new FutureTask[Unit](new Callable[Unit]() {
@@ -38,14 +40,23 @@ class OsmPartitionReader(input: String, hadoop:SerializableHadoopConfigration, s
   private var parseThread: Thread = _
   private val queue = new SynchronousQueue[InternalRow]
   private var currentRow: InternalRow = _
-  private var inputStream: FSDataInputStream = _
+  private var inputStream: InputStream = _
 
-  override def next(): Boolean = {
-    if (parseThread == null) {
+  private def getInputStream: InputStream = {
+    if (useLocal) {
+      val fname = SparkFiles.get(input)
+      new FileInputStream(fname)
+    } else {
       val source = new Path(input)
       val hadoopConfigration = hadoop.get()
       val fs = source.getFileSystem(hadoopConfigration)
-      inputStream = fs.open(source)
+      fs.open(source)
+    }
+  }
+
+  override def next(): Boolean = {
+    if (parseThread == null) {
+      inputStream = getInputStream
       parseThread = new Thread(parserTask)
       parseThread.start()
     }
