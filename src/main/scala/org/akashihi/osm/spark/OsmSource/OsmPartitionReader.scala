@@ -5,8 +5,7 @@ import java.util.function.Consumer
 
 import org.akashihi.osm.parallelpbf.ParallelBinaryParser
 import org.akashihi.osm.parallelpbf.entity._
-import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.SparkSession
+import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.sources.v2.reader.InputPartitionReader
@@ -16,15 +15,11 @@ import org.apache.spark.unsafe.types.UTF8String
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
-class OsmPartitionReader(input: String, schema: StructType, threads: Int, partitionsNo: Int, partition: Int) extends InputPartitionReader[InternalRow] {
+class OsmPartitionReader(input: String, hadoop:SerializableHadoopConfigration, schema: StructType, threads: Int, partitionsNo: Int, partition: Int) extends InputPartitionReader[InternalRow] {
   private val schemaColumnNames = schema.fields.map(_.name)
 
   private val parserTask = new FutureTask[Unit](new Callable[Unit]() {
     override def call: Unit = {
-      val spark = SparkSession.getDefaultSession.get
-      val source = new Path(input)
-      val fs = source.getFileSystem(spark.sparkContext.hadoopConfiguration)
-      val inputStream = fs.open(source)
       val parser = new ParallelBinaryParser(inputStream, threads, partitionsNo, partition)
 
       if (schemaColumnNames.exists(field => field.equalsIgnoreCase("LAT") || field.equals("LON"))) {
@@ -43,9 +38,14 @@ class OsmPartitionReader(input: String, schema: StructType, threads: Int, partit
   private var parseThread: Thread = _
   private val queue = new SynchronousQueue[InternalRow]
   private var currentRow: InternalRow = _
+  private var inputStream: FSDataInputStream = _
 
   override def next(): Boolean = {
     if (parseThread == null) {
+      val source = new Path(input)
+      val hadoopConfigration = hadoop.get()
+      val fs = source.getFileSystem(hadoopConfigration)
+      inputStream = fs.open(source)
       parseThread = new Thread(parserTask)
       parseThread.start()
     }

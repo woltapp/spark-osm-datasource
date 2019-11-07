@@ -41,12 +41,14 @@ object OsmSource {
 class DefaultSource extends DataSourceV2 with ReadSupport {
   override def createReader(options: DataSourceOptions): DataSourceReader = {
     val path = options.get("path").get
-    val spark = SparkSession.getActiveSession.get
+    val spark = SparkSession.active
+    val hadoop = spark.sessionState.newHadoopConf()
     val source = new Path(path)
-    val fs = source.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    val fs = source.getFileSystem(hadoop)
     if (!fs.exists(source)) {
       throw new RuntimeException(s"Input unavailable: $path")
     }
-    new OsmSourceReader(path, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
+    val hadoopConfiguration = new SerializableHadoopConfigration(hadoop)
+    new OsmSourceReader(path, hadoopConfiguration, options.get("partitions").orElse("1"), options.get("threads").orElse("1"))
   }
 }
