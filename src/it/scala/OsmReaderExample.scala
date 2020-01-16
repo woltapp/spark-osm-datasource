@@ -1,11 +1,8 @@
 import org.akashihi.osm.spark.OsmSource.OsmSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.storage.StorageLevel
 
 object OsmReaderExample {
-  private def getQty(df: DataFrame)(osmType: Int): Long = df.filter(col("TYPE") === osmType).select("count").collect().head.getAs[Long](0)
-
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
       .builder()
@@ -16,17 +13,16 @@ object OsmReaderExample {
 
     val osm = spark.read
       .option("threads", 6)
-      .option("partitions", 8)
+      .option("partitions", 32)
       .format(OsmSource.OSM_SOURCE_NAME)
       .load(args(0)).drop("INFO")
-      .persist(StorageLevel.MEMORY_AND_DISK)
 
-    val counted = osm.groupBy("TYPE").count()
 
-    val objectCountGet = getQty(counted)(_)
-    val nodes = objectCountGet(0)
-    val ways = objectCountGet(1)
-    val relations = objectCountGet(2)
+    val counted = osm.filter(col("TAG")("fixme").isNotNull).groupBy("TYPE").count().collect()
+
+    val nodes = counted.filter(r => r.getAs[Int]("TYPE") == 0).head.getAs[Long]("count")
+    val ways = counted.filter(r => r.getAs[Int]("TYPE") == 1).head.getAs[Long]("count")
+    val relations = counted.filter(r => r.getAs[Int]("TYPE") == 2).head.getAs[Long]("count")
 
     println(s"Nodes: $nodes, Ways: $ways, Relations: $relations, partitions: ${osm.rdd.partitions.length}")
   }

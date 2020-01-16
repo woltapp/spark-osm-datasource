@@ -8,13 +8,7 @@ developers := List(Developer("akashihi",
 licenses += ("GPLv3", url("https://www.gnu.org/licenses/gpl-3.0.txt"))
 publishMavenStyle := true
 
-// Add sonatype repository settings
-publishTo := Some(
-  if (isSnapshot.value)
-    Opts.resolver.sonatypeSnapshots
-  else
-    Opts.resolver.sonatypeStaging
-)
+publishTo := sonatypePublishToBundle.value
 
 name := "spark-osm-datasource"
 version := "0.2.0"

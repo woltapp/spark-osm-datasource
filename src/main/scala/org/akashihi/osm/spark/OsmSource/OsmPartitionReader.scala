@@ -24,15 +24,9 @@ class OsmPartitionReader(input: String, hadoop:SerializableHadoopConfigration, s
     override def call: Unit = {
       val parser = new ParallelBinaryParser(inputStream, threads, partitionsNo, partition)
 
-      if (schemaColumnNames.exists(field => field.equalsIgnoreCase("LAT") || field.equals("LON"))) {
-        parser.onNode(onNode)
-      }
-      if (schemaColumnNames.exists(_.equalsIgnoreCase("WAY"))) {
-        parser.onWay(onWay)
-      }
-      if (schemaColumnNames.exists(_.equalsIgnoreCase("RELATION"))) {
-        parser.onRelation(onRelation)
-      }
+      parser.onNode(onNode)
+      parser.onWay(onWay)
+      parser.onRelation(onRelation)
 
       parser.parse()
     }
