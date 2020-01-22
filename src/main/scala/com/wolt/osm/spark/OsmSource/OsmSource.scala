@@ -38,7 +38,7 @@ object OsmSource {
     StructField("RELATION", ArrayType(StructType(member), containsNull = false), nullable = true)
   )
 
-  val schema = StructType(fields)
+  val schema: StructType = StructType(fields)
 }
 
 class DefaultSource extends DataSourceV2 with ReadSupport {
