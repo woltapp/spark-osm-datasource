@@ -22,7 +22,7 @@ resolvers += mavenLocal
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.4.4",
   "org.apache.spark" %% "spark-sql" % "2.4.4",
-  "org.akashihi.osm" % "parallelpbf" % "0.1.1",
+  "com.wolt.osm" % "parallelpbf" % "0.2.0",
   "org.scalatest" %% "scalatest" % "3.0.8" % "it,test",
   "org.scalactic" %% "scalactic" % "3.0.8" % "it,test"
 )

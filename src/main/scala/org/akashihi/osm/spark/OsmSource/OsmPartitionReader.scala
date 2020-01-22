@@ -4,8 +4,8 @@ import java.io.{FileInputStream, InputStream}
 import java.util.concurrent._
 import java.util.function.Consumer
 
-import org.akashihi.osm.parallelpbf.ParallelBinaryParser
-import org.akashihi.osm.parallelpbf.entity._
+import com.wolt.osm.parallelpbf.ParallelBinaryParser
+import com.wolt.osm.parallelpbf.entity._
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.SparkFiles
 import org.apache.spark.sql.catalyst.InternalRow
