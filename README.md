@@ -15,33 +15,33 @@ Supported scala versions are 2.11 and 2.12
 ### Maven 
         
          <dependency>
-                <groupId>org.akashihi.osm</groupId>
+                <groupId>com.wolt.osm</groupId>
                 <artifactId>spark-osm-datasource_2.11</artifactId>
-                <version>0.1.0</version>
+                <version>0.3.0</version>
          </dependency>
 
          <dependency>
-                <groupId>org.akashihi.osm</groupId>
+                <groupId>com.wolt.osm</groupId>
                 <artifactId>spark-osm-datasource_2.12</artifactId>
-                <version>0.1.0</version>
+                <version>0.3.0</version>
          </dependency>
         
 ### Gradle
 
-         compile group: 'org.akashihi.osm', name: 'spark-osm-datasource_2.11', version: '0.1.0'
-         compile group: 'org.akashihi.osm', name: 'spark-osm-datasource_2.12', version: '0.1.0'
+         compile group: 'com.wolt.osm', name: 'spark-osm-datasource_2.11', version: '0.3.0'
+         compile group: 'com.wolt.osm', name: 'spark-osm-datasource_2.12', version: '0.3.0'
         
 ### SBT 
                         
-        libraryDependencies += "org.akashihi.osm" % "spark-osm-datasource" % "0.1.0"
+        libraryDependencies += "com.wolt.osm" % "spark-osm-datasource" % "0.3.0"
         
 ### Github release
 
-        https://github.com/akashihi/spark-osm-datasource/releases/tag/v0.1.0
+        https://github.com/woltapp/spark-osm-datasource/releases/tag/v0.31.0
         
 ## Usage                
         
-OSM PBF data source uses [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf) internally, therefore it needs to provide
+OSM PBF data source uses [parallel OSM PBF parser](https://github.com/woltapp/parallelpbf) internally, therefore it needs to provide
 it with a input stream. OSM DataSource internally uses HDFS driver, so it will accept any HDFS compatible path, like local
 file, http link, s3 link etc and convert it to the inputstream. The stream will be opened and read as many times, as many
 partitions are requested:
@@ -58,7 +58,7 @@ There are two options for the reader:
 
 * `partitions` - Number of partitions to split OSM PBF file. Pay attentions, that full planet file is about 1.2TB of uncompressed data, so plan
 your partitioning accordingly.
-* `threads` - Number of threads to use by [parallel OSM PBF parser](https://github.com/akashihi/parallelpbf). Keep it
+* `threads` - Number of threads to use by [parallel OSM PBF parser](https://github.com/woltapp/parallelpbf). Keep it
 `1` for a local deployments or set to number of cores per worker node.
 * `useLocalFile` - Enables Spark file distribution mechanics, see below.
 
@@ -118,7 +118,7 @@ each run. In case order is important for you, you can sort the dataframe after l
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/akashihi/spark-osm-reader/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/woltapp/spark-osm-reader/tags). 
 
 ## Authors
 
