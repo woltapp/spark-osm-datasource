@@ -1,4 +1,4 @@
-package org.akashihi.osm.spark.OsmSource
+package com.wolt.osm.spark.OsmSource
 
 import java.io.File
 
@@ -10,7 +10,7 @@ import org.apache.spark.sql.sources.v2.{DataSourceOptions, DataSourceV2, ReadSup
 import org.apache.spark.sql.types._
 
 object OsmSource {
-  val OSM_SOURCE_NAME = "org.akashihi.osm.spark.OsmSource"
+  val OSM_SOURCE_NAME = "com.wolt.osm.spark.OsmSource"
 
   private val info = Seq(
     StructField("UID", IntegerType, nullable = true),

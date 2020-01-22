@@ -1,4 +1,4 @@
-package org.akashihi.osm.spark.OsmSource
+package com.wolt.osm.spark.OsmSource
 
 import java.io.{FileInputStream, InputStream}
 import java.util.concurrent._

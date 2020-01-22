@@ -1,4 +1,4 @@
-import org.akashihi.osm.spark.OsmSource.OsmSource
+import com.wolt.osm.spark.OsmSource.OsmSource
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
